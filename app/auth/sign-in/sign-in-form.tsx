@@ -11,7 +11,7 @@ export function SignInForm() {
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  async function submit(event: FormEvent<HTMLFormElement>) {
+  async function signInWithGoogle() {\n    setError("");\n    setSubmitting(true);\n    try {\n      const result = await authClient.signIn.social({ provider: "google", callbackURL: "/platform-admin" });\n      if (result.error) setError(result.error.message || "Google sign-in is unavailable. Please try again.");\n    } catch {\n      setError("Google sign-in is temporarily unavailable. Please try again.");\n    } finally {\n      setSubmitting(false);\n    }\n  }\n\n  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
     setSubmitting(true);
@@ -50,7 +50,7 @@ export function SignInForm() {
       <button className="auth-submit" type="submit" disabled={submitting}>
         {submitting ? "Signing in…" : "Sign in securely"} <span>→</span>
       </button>
-      <p className="auth-help">Caregrid accounts are provisioned by a facility administrator. Public registration is not offered in this workspace.</p>
+      <div className="auth-divider"><span>OR</span></div>\n      <button className="auth-submit auth-google" type="button" disabled={submitting} onClick={signInWithGoogle}>Continue with Google <span>↗</span></button>\n      <p className="auth-help">Use your verified Google work account or an account provisioned by your facility administrator. Public registration is not offered in this workspace.</p>
     </form>
   );
 }
