@@ -1,98 +1,59 @@
-"use client";
+import Link from "next/link";
 
-import { useMemo, useState } from "react";
-
-type Section = "Overview" | "Patients" | "Appointments" | "Clinical" | "Laboratory" | "Pharmacy" | "Billing" | "Reports" | "Settings";
-const groups: { title: string; items: { name: Section; icon: string }[] }[] = [
-  { title: "WORKSPACE", items: [{ name: "Overview", icon: "▦" }, { name: "Patients", icon: "♙" }, { name: "Appointments", icon: "▣" }] },
-  { title: "CARE DELIVERY", items: [{ name: "Clinical", icon: "✚" }, { name: "Laboratory", icon: "⌬" }, { name: "Pharmacy", icon: "⚕" }] },
-  { title: "OPERATIONS", items: [{ name: "Billing", icon: "₦" }, { name: "Reports", icon: "▥" }, { name: "Settings", icon: "⚙" }] },
+const capabilities = [
+  { n: "01", title: "Patient administration", desc: "A complete patient journey, from first registration to every visit that follows.", icon: "＋", tags: ["Patient records", "Appointments", "Queue management"] },
+  { n: "02", title: "Clinical care", desc: "Give care teams a clear, connected view of encounters, observations and decisions.", icon: "✚", tags: ["Clinical notes", "Vitals & history", "Care plans"] },
+  { n: "03", title: "Diagnostics & pharmacy", desc: "Bring laboratory workflows and medication operations into one coordinated system.", icon: "⌬", tags: ["Lab orders", "Results review", "Stock control"] },
+  { n: "04", title: "Finance & operations", desc: "Connect services, invoices, payments and operational visibility across your facility.", icon: "₦", tags: ["Billing", "Receipts", "Reporting"] },
 ];
-const appointments = [
-  { initials: "AO", name: "Amaka Okafor", id: "CG-000184", department: "General medicine", time: "09:00 AM", status: "Checked in", tone: "green" },
-  { initials: "EO", name: "Emeka Obi", id: "CG-000183", department: "Cardiology", time: "09:15 AM", status: "Waiting", tone: "amber" },
-  { initials: "FA", name: "Fatima Abubakar", id: "CG-000182", department: "Paediatrics", time: "09:30 AM", status: "In consultation", tone: "blue" },
-  { initials: "TI", name: "Tunde Ibrahim", id: "CG-000181", department: "General medicine", time: "10:00 AM", status: "Scheduled", tone: "slate" },
+const steps = [
+  ["01", "One connected workspace", "Bring front desk, clinical, diagnostics, pharmacy and finance teams into a shared operating picture."],
+  ["02", "Built around accountable access", "Facility-aware roles, tenant isolation and traceable actions are foundational—not add-ons."],
+  ["03", "Designed to grow with care", "Start with the workflows your facility needs and expand as your operations mature."],
 ];
-const summaries: Record<Section, string> = {
-  Overview: "Here’s what’s happening at your facility today.",
-  Patients: "Find patient records and manage registrations.",
-  Appointments: "Coordinate today’s schedule and patient queue.",
-  Clinical: "Encounters, observations and care notes.",
-  Laboratory: "Track test orders, specimens and result reviews.",
-  Pharmacy: "Manage dispensing, stock levels and expiry dates.",
-  Billing: "Track invoices, receipts and outstanding balances.",
-  Reports: "Operational snapshots for your facility.",
-  Settings: "Manage your facility workspace and preferences.",
-};
-function Icon({ children }: { children: React.ReactNode }) { return <span className="nav-icon" aria-hidden="true">{children}</span>; }
+export default function LandingPage() {
+  return <main className="landing">
+    <header className="landing-nav">
+      <Link className="landing-brand" href="/"><span className="landing-mark">✚</span><span>caregrid<span className="brand-period">.</span><small>HEALTH SYSTEMS</small></span></Link>
+      <nav className="landing-links" aria-label="Main navigation"><a href="#platform">Platform</a><a href="#workflows">Workflows</a><a href="#security">Security</a><a href="#about">About</a></nav>
+      <div className="landing-nav-actions"><Link className="nav-login" href="/dashboard">Sign in <span>↗</span></Link><Link className="nav-cta" href="/dashboard">Explore workspace <span>→</span></Link></div>
+    </header>
 
-export default function Home() {
-  const [active, setActive] = useState<Section>("Overview");
-  const [search, setSearch] = useState("");
-  const [modal, setModal] = useState(false);
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [notice, setNotice] = useState("");
-  const [patients, setPatients] = useState([
-    { name: "Amaka Okafor", id: "CG-000184" }, { name: "Emeka Obi", id: "CG-000183" },
-    { name: "Fatima Abubakar", id: "CG-000182" }, { name: "Tunde Ibrahim", id: "CG-000181" },
-  ]);
-  const filtered = useMemo(() => patients.filter(p => (p.name + p.id).toLowerCase().includes(search.toLowerCase())), [patients, search]);
-  function addPatient(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    if (!name.trim()) return;
-    const id = "CG-" + String(185 + patients.length - 4).padStart(6, "0");
-    setPatients(current => [{ name: name.trim(), id }, ...current]);
-    setName(""); setPhone(""); setModal(false); setActive("Patients");
-    setNotice("Demo record added to this browser session only. Database persistence is not connected yet.");
-  }
-
-  return <div className="shell">
-    <aside className="sidebar">
-      <button className="brand" onClick={() => setActive("Overview")} aria-label="Caregrid home"><span className="brand-mark">✚</span><span className="brand-name">caregrid<span>.</span><small>HOSPITAL OS</small></span></button>
-      <div className="facility"><span className="facility-logo">CG</span><span><b>Caregrid Demo</b><small>Primary facility</small></span><span className="chevron">⌄</span></div>
-      {groups.map(group => <nav className="nav-group" key={group.title} aria-label={group.title}><p>{group.title}</p>{group.items.map(item => <button key={item.name} className={active === item.name ? "nav-item active" : "nav-item"} onClick={() => { setActive(item.name); setNotice(""); }}><Icon>{item.icon}</Icon><span>{item.name}</span>{item.name === "Appointments" && <small className="count">8</small>}</button>)}</nav>)}
-      <div className="sidebar-spacer" />
-      <div className="help-box"><span>?</span><div><b>Need a hand?</b><small>Visit the help centre</small></div></div>
-      <div className="profile"><span className="avatar">AD</span><span><b>Facility Admin</b><small>Administrator</small></span><span className="dots">···</span></div>
-    </aside>
-
-    <main className="main">
-      <header className="topbar"><div className="crumb">Caregrid <span>/</span> <b>{active}</b></div><div className="top-actions"><label className="search"><span>⌕</span><input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search patients, records..." aria-label="Search patients and records" /></label><button className="notification" aria-label="Notifications" onClick={() => setNotice("You’re all caught up. Notifications will appear here.")}>♧<i /></button><span className="avatar top-avatar">AD</span></div></header>
-      <div className="content">
-        {notice && <div className="notice" role="status">{notice}<button onClick={() => setNotice("")} aria-label="Dismiss">×</button></div>}
-        <div className="page-heading"><div><div className="eyebrow"><i /> THURSDAY, 29 OCTOBER 2026</div><h1>{active === "Overview" ? "Good morning, Admin" : active}</h1><p>{summaries[active]}</p></div><div className="heading-buttons"><button className="button secondary" onClick={() => setNotice("Exports will be enabled when reports are connected to saved data.")}>↧ Export report</button><button className="button primary" onClick={() => setModal(true)}>＋ Register patient</button></div></div>
-
-        {active === "Overview" && <>
-          <div className="demo-banner"><span className="banner-icon">✳</span><div><b>Your facility at a glance</b><p>This workspace uses sample data while secure patient workflows are being built.</p></div><span className="demo-tag">DEMO DATA</span></div>
-          <section className="stats">
-            <article className="stat"><div className="stat-head">Patients today <span className="stat-icon mint">♙</span></div><strong>48 <small className="positive">↗ 12.5%</small></strong><div className="stat-foot">vs. previous day <span>▁▃▂▅▄▆▅█</span></div></article>
-            <article className="stat"><div className="stat-head">Waiting queue <span className="stat-icon yellow">◷</span></div><strong>08 <small className="neutral">Live queue</small></strong><div className="stat-foot">Average wait 18 min <span>▆▅▄▅▃▄▂▃</span></div></article>
-            <article className="stat"><div className="stat-head">Lab requests <span className="stat-icon lilac">⌬</span></div><strong>23 <small className="positive">↗ 4.2%</small></strong><div className="stat-foot">4 results need review <span>▂▃▅▄▃▆▄█</span></div></article>
-            <article className="stat"><div className="stat-head">Revenue today <span className="stat-icon peach">₦</span></div><strong>₦842,500</strong><div className="stat-foot">12 invoices outstanding <span>▂▃▂▄▅▄▆█</span></div></article>
-          </section>
-          <section className="dashboard-grid">
-            <article className="panel"><div className="panel-head"><div><h2>Today’s appointments</h2><p>Thursday, 29 October <i className="tiny-dot" /> 8 scheduled</p></div><button className="text-link" onClick={() => setActive("Appointments")}>View schedule →</button></div>
-              <div className="table-scroll"><table><thead><tr><th>PATIENT</th><th>DEPARTMENT</th><th>TIME</th><th>STATUS</th></tr></thead><tbody>{appointments.map(a => <tr key={a.id}><td><div className="patient"><span className="patient-avatar">{a.initials}</span><span><b>{a.name}</b><small>{a.id}</small></span></div></td><td>{a.department}</td><td>{a.time}</td><td><span className={"status " + a.tone}><i />{a.status}</span></td></tr>)}</tbody></table></div>
-              <div className="panel-foot">Showing 4 of 8 appointments <button onClick={() => setActive("Appointments")}>See all appointments →</button></div>
-            </article>
-            <article className="panel attention"><div className="panel-head"><div><h2>Needs attention</h2><p>Items for your team today</p></div><span className="attention-count">3</span></div>
-              {[["⌬","Review pending lab results","4 results awaiting review","purple","Laboratory"],["⚕","Low-stock medication alert","3 items need attention","orange","Pharmacy"],["₦","Outstanding balances","₦248,500 across 12 invoices","mint","Billing"]].map(t => <button className="task" key={t[1]} onClick={() => setActive(t[4] as Section)}><span className={"task-icon " + t[3]}>{t[0]}</span><span><b>{t[1]}</b><small>{t[2]}</small></span><i>→</i></button>)}
-              <button className="text-link task-bottom" onClick={() => setActive("Reports")}>View operational summary →</button>
-            </article>
-          </section>
-          <section className="bottom-grid"><article className="panel"><div className="panel-head"><div><h2>Patient activity</h2><p>Visits across the last 7 days</p></div><span className="select-chip">This week⌄</span></div><div className="chart">{[45,30,19,56,43,67,77].map((n,i) => <div className="bar" key={i}><div><span style={{height:n+"%"}} /></div><small>{["Fri","Sat","Sun","Mon","Tue","Wed","Thu"][i]}</small></div>)}</div><div className="chart-caption"><span><i /> Patient visits</span><small>Illustrative sample values</small></div></article>
-          <article className="panel"><div className="panel-head"><div><h2>Quick actions</h2><p>Common tasks, one click away</p></div></div><div className="quick-grid"><button onClick={() => setModal(true)}><span className="quick-icon mint">＋</span><b>New patient</b><small>Register a patient</small></button><button onClick={() => setActive("Appointments")}><span className="quick-icon yellow">▣</span><b>Book appointment</b><small>Schedule a visit</small></button><button onClick={() => setActive("Clinical")}><span className="quick-icon lilac">✚</span><b>New encounter</b><small>Start a consultation</small></button><button onClick={() => setActive("Billing")}><span className="quick-icon peach">₦</span><b>Create invoice</b><small>Record a charge</small></button></div></article></section>
-        </>}
-
-        {active === "Patients" && <section className="panel patient-directory"><div className="panel-head"><div><h2>Patient directory</h2><p>{patients.length} demo records in this browser session</p></div><button className="button primary" onClick={() => setModal(true)}>＋ Register patient</button></div><div className="table-scroll"><table><thead><tr><th>PATIENT</th><th>PATIENT ID</th><th>RECORD STATUS</th></tr></thead><tbody>{filtered.map(p => <tr key={p.id}><td><div className="patient"><span className="patient-avatar">{p.name.split(" ").map(x=>x[0]).slice(0,2).join("")}</span><span><b>{p.name}</b><small>Demo record</small></span></div></td><td>{p.id}</td><td><span className="status green"><i />Demo only</span></td></tr>)}</tbody></table>{filtered.length === 0 && <div className="empty">No matching demo patients. Try another search.</div>}</div><div className="warning">Demo-only records are held in browser memory and are not saved to the database.</div></section>}
-
-        {active !== "Overview" && active !== "Patients" && <section className="module-card"><span className="module-symbol">{groups.flatMap(g=>g.items).find(x=>x.name===active)?.icon}</span><div className="eyebrow">CAREGRID WORKSPACE</div><h2>{active} module</h2><p>{summaries[active]} This workspace is mapped in the interface; its secure data workflows will be implemented and connected to PostgreSQL in stages.</p><div className="module-list"><div><span>01</span><b>Data model and validation</b><small>Tenant-scoped records and safe input rules</small></div><div><span>02</span><b>Role-based access</b><small>Permissions enforced on the server</small></div><div><span>03</span><b>Audited workflow</b><small>Traceable actions and reliable error handling</small></div></div><button className="button secondary" onClick={() => setActive("Overview")}>← Back to overview</button></section>}
+    <section className="hero">
+      <div className="hero-copy">
+        <div className="hero-kicker"><i/> THE OPERATING SYSTEM FOR BETTER CARE <span>BUILT FOR AFRICA</span></div>
+        <h1>Healthcare operations,<br/><em>finally in sync.</em></h1>
+        <p className="hero-lede">One considered workspace for the people, processes and decisions behind exceptional care. Connect your hospital operations—from the first patient touchpoint to the final receipt.</p>
+        <div className="hero-actions"><Link href="/dashboard" className="hero-primary">Explore Caregrid <span>↗</span></Link><a href="#platform" className="hero-secondary">Discover the platform <span>↓</span></a></div>
+        <div className="hero-proof"><div className="proof-avatars"><span>+</span><span>✚</span><span>◎</span></div><p><b>Designed for connected care teams</b><small>Clinics · Hospitals · Diagnostic centres</small></p></div>
       </div>
-      <footer className="footer"><span>© 2026 Caregrid Health Systems</span><span><i /> System workspace · <b>Demo environment</b></span></footer>
-    </main>
+      <div className="hero-art" aria-label="Caregrid connected hospital operations illustration">
+        <div className="art-glow"/>
+        <div className="art-orbit orbit-one"/><div className="art-orbit orbit-two"/>
+        <div className="art-label label-top"><i/> ONE CONNECTED WORKSPACE</div>
+        <div className="dashboard-preview">
+          <div className="preview-top"><div className="preview-brand"><span>✚</span> caregrid</div><div className="preview-dots"><i/><i/><i/></div></div>
+          <div className="preview-body"><div className="preview-side"><b/><i/><i/><i/><i/><i/></div><div className="preview-main"><div className="preview-greeting"><span><small>THURSDAY · FACILITY OVERVIEW</small><b>Your care, connected.</b></span><i>•••</i></div><div className="preview-metrics"><div><small>VISITS TODAY</small><b>128</b><i>↗ 8.4%</i></div><div><small>IN QUEUE</small><b>08</b><i>Live</i></div><div><small>LAB REVIEWS</small><b>12</b><i>4 pending</i></div></div><div className="preview-lower"><div className="preview-chart"><small>CARE ACTIVITY</small><div className="chart-lines"><i/><i/><i/><i/><i/><i/><i/></div><div className="chart-days"><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span></div></div><div className="preview-queue"><small>CARE TEAM QUEUE</small><div><i>AO</i><span><b>Patient check-in</b><small>General medicine</small></span><em/></div><div><i>EK</i><span><b>Lab review</b><small>Diagnostics</small></span><em/></div><div><i>TM</i><span><b>Consultation</b><small>Clinical care</small></span><em/></div></div></div></div></div>
+        </div>
+        <div className="floating-card float-care"><span>✚</span><div><small>CARE DELIVERY</small><b>Connected teams</b></div><i>↗</i></div>
+        <div className="floating-card float-secure"><span>⌑</span><div><small>ACCESS BY DESIGN</small><b>Facility-aware security</b></div><i>✓</i></div>
+        <div className="art-caption">A clearer view of the work that matters.</div>
+      </div>
+      <div className="hero-bottomline"><span>01 / A MORE CONNECTED STANDARD</span><span>BUILT FOR THE REALITIES OF MODERN HEALTHCARE <b>↓</b></span></div>
+    </section>
 
-    {modal && <div className="modal-backdrop" onMouseDown={e => { if (e.target === e.currentTarget) setModal(false); }}><section className="modal" role="dialog" aria-modal="true" aria-labelledby="register-title"><div className="modal-head"><div><div className="eyebrow">PATIENT ADMINISTRATION</div><h2 id="register-title">Register a patient</h2><p>Demo only — data is not persisted.</p></div><button className="close" onClick={() => setModal(false)} aria-label="Close">×</button></div><form onSubmit={addPatient}><label>Patient full name<input autoFocus value={name} onChange={e=>setName(e.target.value)} required placeholder="Enter full name" /></label><label>Phone number <small>OPTIONAL</small><input value={phone} onChange={e=>setPhone(e.target.value)} placeholder="+234 800 000 0000" /></label><div className="form-note">ⓘ Do not enter real patient information. Database persistence and access controls are not implemented yet.</div><div className="modal-actions"><button type="button" className="button secondary" onClick={() => setModal(false)}>Cancel</button><button type="submit" className="button primary">Add demo patient</button></div></form></section></div>}
-  </div>;
+    <section className="trust-strip"><span>ONE PLATFORM, EVERY PART OF THE PATIENT JOURNEY</span><div><b>Patient administration</b><i/> <b>Clinical care</b><i/> <b>Diagnostics</b><i/> <b>Pharmacy</b><i/> <b>Hospital finance</b></div></section>
+
+    <section className="platform-section" id="platform"><div className="section-intro"><div><div className="section-kicker">THE CAREGRID PLATFORM <span>— 01</span></div><h2>Everything works better<br/>when it works <em>together.</em></h2></div><p>Care delivery is a team effort. Caregrid brings the essential work of running a healthcare facility into one coherent system—so information moves with the patient, not between disconnected tools.</p></div>
+      <div className="capability-grid">{capabilities.map(c=><article className="capability" key={c.n}><div className="cap-top"><span>{c.n} / WORKFLOW</span><i>{c.icon}</i></div><h3>{c.title}</h3><p>{c.desc}</p><div className="cap-tags">{c.tags.map(t=><span key={t}>{t}</span>)}</div><div className="cap-arrow">↗</div></article>)}</div>
+    </section>
+
+    <section className="manifesto" id="workflows"><div className="manifesto-left"><div className="section-kicker light">A BETTER WAY TO RUN CARE <span>— 02</span></div><h2>Less operational<br/>friction. More room<br/>for <em>better care.</em></h2><p>When teams share context, handovers become clearer, work becomes easier to follow, and leaders can see where attention is needed.</p><Link href="/dashboard">See the workspace <span>↗</span></Link></div><div className="manifesto-right">{steps.map(s=><article key={s[0]}><span>{s[0]}</span><div><h3>{s[1]}</h3><p>{s[2]}</p></div><b>↗</b></article>)}</div><div className="manifesto-watermark">caregrid.</div></section>
+
+    <section className="security-section" id="security"><div className="security-visual"><div className="security-ring ring-a"/><div className="security-ring ring-b"/><div className="security-core"><span>⌑</span><b>TRUST<br/>BY DESIGN</b><small>CAREGRID SECURITY FOUNDATION</small></div><div className="security-node node-a">TENANT ISOLATION</div><div className="security-node node-b">ROLE-AWARE ACCESS</div><div className="security-node node-c">AUDIT TRAILS</div></div><div className="security-copy"><div className="section-kicker">BUILT ON A STRONG FOUNDATION <span>— 03</span></div><h2>Trust is not a feature.<br/><em>It is the foundation.</em></h2><p>Healthcare software must take privacy, accountability and access seriously. Caregrid’s architecture is being built around tenant isolation, facility-aware permissions and traceable clinical and operational actions.</p><ul><li><i>✓</i> Organization and facility-level data boundaries</li><li><i>✓</i> Server-enforced access and role permissions</li><li><i>✓</i> Auditability for sensitive workflows</li><li><i>✓</i> Designed with Nigerian healthcare operations in mind</li></ul><small className="security-note">Caregrid is under active development. Production authentication, database connection, security validation and regulatory review are not yet complete.</small></div></section>
+
+    <section className="closing-cta" id="about"><div className="closing-orb"/><div className="section-kicker light">THE NEXT CHAPTER OF CONNECTED CARE</div><h2>Make every part of care<br/><em>move as one.</em></h2><p>One thoughtful platform for the people who keep healthcare moving.</p><Link href="/dashboard">Explore Caregrid <span>↗</span></Link><div className="closing-index">CAREGRID HEALTH SYSTEMS <span>·</span> 2026</div></section>
+
+    <footer className="landing-footer"><Link className="landing-brand" href="/"><span className="landing-mark">✚</span><span>caregrid<span className="brand-period">.</span><small>HEALTH SYSTEMS</small></span></Link><p>Connected operations. More focused care.</p><div><a href="#platform">Platform</a><a href="#security">Security</a><Link href="/dashboard">Workspace ↗</Link></div><small>© 2026 Caregrid Health Systems. All rights reserved.</small></footer>
+  </main>;
 }
