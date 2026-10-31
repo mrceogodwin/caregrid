@@ -4,14 +4,14 @@ Caregrid is a multi-tenant hospital operations platform being built for private 
 
 ## Current status
 - Production Neon PostgreSQL project and dedicated `caregrid` database are connected to Vercel.
-- Migrations 0001–0003 are applied to production. The database contains 13 tenant-scoped tables with forced row-level security, tenant policies, composite tenant constraints and immutable clinical/audit triggers.
+- Migrations 0001–0004 are applied to production. The database contains 13 tenant-scoped tables with forced row-level security, tenant policies, composite tenant constraints and immutable clinical/audit triggers.
 - The Vercel runtime uses the dedicated `caregrid_app` role. It is not a superuser and cannot bypass row-level security.
 - The production database health endpoint returns a generic readiness result at `/api/health/database`.
-- Neon Auth (managed Better Auth) is provisioned for the production branch. The Next.js sign-in integration and active facility membership gate are being implemented.
+- Neon Auth (managed Better Auth) is provisioned for production. The Next.js sign-in page, auth API handler, protected dashboard route and active facility membership gate are deployed. The initial owner account and invitation workflow still need setup.
 - The dashboard remains a demo preview. Sample patients, metrics and registration interactions are not real records and are not persisted.
 
 ## Technology
-- Next.js App Router, React and TypeScript
+- Next.js 16 App Router, React and TypeScript
 - PostgreSQL on Neon; SQL migrations in `db/migrations`
 - Server-only PostgreSQL client in `lib/db.ts`
 - Managed Neon Auth for identity; organization/facility roles remain in Caregrid's own membership tables
@@ -27,7 +27,7 @@ Caregrid is a multi-tenant hospital operations platform being built for private 
 Set secrets in Vercel or local `.env.local`; never commit real values or expose them with a `NEXT_PUBLIC_` prefix.
 
 ## Database migrations
-Production has migrations 0001, 0002 and 0003 applied. The read-only verifier is `db/verify/verify_schema.sql`. Migration 0004 adds a narrow server-only resolver for the signed-in user's active facility memberships; test it on a branch before applying it to production.
+Production has migrations 0001, 0002 and 0003 applied. The read-only verifier is `db/verify/verify_schema.sql`. Migration 0004 adds a narrow SECURITY DEFINER resolver for the signed-in user's active facility memberships. It was tested on an isolated branch and applied to production.
 
 Tenant context must be set transaction-locally by trusted server code only after validating the signed-in user's active membership. Never trust a tenant ID supplied by a browser request. Normal application queries must use `caregrid_app`, not `caregrid_owner`.
 
