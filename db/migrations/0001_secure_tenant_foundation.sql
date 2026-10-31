@@ -92,7 +92,8 @@ CREATE TABLE IF NOT EXISTS patients (
     FOREIGN KEY (organization_id, facility_id)
     REFERENCES facilities (organization_id, id) ON DELETE RESTRICT,
   CONSTRAINT patients_facility_number_unique UNIQUE (facility_id, patient_number),
-  CONSTRAINT patients_org_id_id_unique UNIQUE (organization_id, id)
+  CONSTRAINT patients_org_id_id_unique UNIQUE (organization_id, id),
+  CONSTRAINT patients_org_facility_id_unique UNIQUE (organization_id, facility_id, id)
 );
 
 CREATE INDEX IF NOT EXISTS patients_org_name_idx
@@ -100,6 +101,8 @@ CREATE INDEX IF NOT EXISTS patients_org_name_idx
 CREATE INDEX IF NOT EXISTS patients_org_phone_idx
   ON patients (organization_id, phone_e164)
   WHERE phone_e164 IS NOT NULL;
+CREATE INDEX IF NOT EXISTS patient_identifiers_org_patient_idx
+  ON patient_identifiers (organization_id, patient_id);
 
 CREATE TABLE IF NOT EXISTS patient_identifiers (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -109,12 +112,9 @@ CREATE TABLE IF NOT EXISTS patient_identifiers (
   identifier_type text NOT NULL CHECK (length(trim(identifier_type)) BETWEEN 2 AND 40),
   identifier_value text NOT NULL CHECK (length(trim(identifier_value)) BETWEEN 1 AND 100),
   created_at timestamptz NOT NULL DEFAULT now(),
-  CONSTRAINT patient_identifiers_patient_tenant_fk
-    FOREIGN KEY (organization_id, patient_id)
-    REFERENCES patients (organization_id, id) ON DELETE RESTRICT,
-  CONSTRAINT patient_identifiers_facility_tenant_fk
-    FOREIGN KEY (organization_id, facility_id)
-    REFERENCES facilities (organization_id, id) ON DELETE RESTRICT,
+  CONSTRAINT patient_identifiers_patient_facility_fk
+    FOREIGN KEY (organization_id, facility_id, patient_id)
+    REFERENCES patients (organization_id, facility_id, id) ON DELETE RESTRICT,
   CONSTRAINT patient_identifiers_facility_value_unique
     UNIQUE (facility_id, identifier_type, identifier_value)
 );
