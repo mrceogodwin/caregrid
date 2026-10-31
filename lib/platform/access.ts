@@ -31,3 +31,24 @@ export async function getPlatformAdminRole(user: VerifiedAuthUser) {
     return null;
   }
 }
+
+
+export async function getPlatformAdminStatus(user: VerifiedAuthUser) {
+  const email = user.email?.trim().toLowerCase();
+  if (!user.id || !email || user.emailVerified !== true) return null;
+
+  try {
+    const db = getDb();
+    const rows = await db<{ role: string; enabled: boolean }[]>`
+      SELECT role, enabled
+      FROM app_private.platform_admin_allowlist
+      WHERE email = ${email}
+      LIMIT 1
+    `;
+    const entry = rows[0];
+    if (entry?.role !== "platform_super_admin") return null;
+    return entry.enabled ? "active" : "pending_activation";
+  } catch {
+    return null;
+  }
+}
