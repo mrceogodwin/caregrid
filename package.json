@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@neondatabase/auth": "0.7.0-beta",
-    "next": "15.5.7",
+    "next": "16.4.3",
     "postgres": "3.4.7",
     "react": "19.1.1",
     "react-dom": "19.1.1"
@@ -21,7 +21,7 @@
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.7",
     "eslint": "^9.28.0",
-    "eslint-config-next": "15.5.7",
+    "eslint-config-next": "16.4.3",
     "typescript": "^5.8.3"
   }
 }
