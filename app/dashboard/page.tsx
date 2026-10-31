@@ -35,15 +35,15 @@ export default function Home() {
   const [phone, setPhone] = useState("");
   const [notice, setNotice] = useState("");
   const [patients, setPatients] = useState([
-    { name: "Amaka Okafor", id: "CG-000184" }, { name: "Emeka Obi", id: "CG-000183" },
-    { name: "Fatima Abubakar", id: "CG-000182" }, { name: "Tunde Ibrahim", id: "CG-000181" },
+    { name: "Amaka Okafor", id: "CG-000184", phone: "" }, { name: "Emeka Obi", id: "CG-000183", phone: "" },
+    { name: "Fatima Abubakar", id: "CG-000182", phone: "" }, { name: "Tunde Ibrahim", id: "CG-000181", phone: "" },
   ]);
   const filtered = useMemo(() => patients.filter(p => (p.name + p.id).toLowerCase().includes(search.toLowerCase())), [patients, search]);
   function addPatient(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!name.trim()) return;
     const id = "CG-" + String(185 + patients.length - 4).padStart(6, "0");
-    setPatients(current => [{ name: name.trim(), id }, ...current]);
+    setPatients(current => [{ name: name.trim(), id, phone: phone.trim() }, ...current]);
     setName(""); setPhone(""); setModal(false); setActive("Patients");
     setNotice("Demo record added to this browser session only. Database persistence is not connected yet.");
   }
@@ -73,7 +73,7 @@ export default function Home() {
             <article className="stat"><div className="stat-head">Revenue today <span className="stat-icon peach">₦</span></div><strong>₦842,500</strong><div className="stat-foot">12 invoices outstanding <span>▂▃▂▄▅▄▆█</span></div></article>
           </section>
           <section className="dashboard-grid">
-            <article className="panel"><div className="panel-head"><div><h2>Today’s appointments</h2><p>Thursday, 29 October <i className="tiny-dot" /> 8 scheduled</p></div><button className="text-link" onClick={() => setActive("Appointments")}>View schedule →</button></div>
+            <article className="panel"><div className="panel-head"><div><h2>Today’s appointments</h2><p>Saturday, 31 October <i className="tiny-dot" /> 8 scheduled</p></div><button className="text-link" onClick={() => setActive("Appointments")}>View schedule →</button></div>
               <div className="table-scroll"><table><thead><tr><th>PATIENT</th><th>DEPARTMENT</th><th>TIME</th><th>STATUS</th></tr></thead><tbody>{appointments.map(a => <tr key={a.id}><td><div className="patient"><span className="patient-avatar">{a.initials}</span><span><b>{a.name}</b><small>{a.id}</small></span></div></td><td>{a.department}</td><td>{a.time}</td><td><span className={"status " + a.tone}><i />{a.status}</span></td></tr>)}</tbody></table></div>
               <div className="panel-foot">Showing 4 of 8 appointments <button onClick={() => setActive("Appointments")}>See all appointments →</button></div>
             </article>
@@ -86,7 +86,7 @@ export default function Home() {
           <article className="panel"><div className="panel-head"><div><h2>Quick actions</h2><p>Common tasks, one click away</p></div></div><div className="quick-grid"><button onClick={() => setModal(true)}><span className="quick-icon mint">＋</span><b>New patient</b><small>Register a patient</small></button><button onClick={() => setActive("Appointments")}><span className="quick-icon yellow">▣</span><b>Book appointment</b><small>Schedule a visit</small></button><button onClick={() => setActive("Clinical")}><span className="quick-icon lilac">✚</span><b>New encounter</b><small>Start a consultation</small></button><button onClick={() => setActive("Billing")}><span className="quick-icon peach">₦</span><b>Create invoice</b><small>Record a charge</small></button></div></article></section>
         </>}
 
-        {active === "Patients" && <section className="panel patient-directory"><div className="panel-head"><div><h2>Patient directory</h2><p>{patients.length} demo records in this browser session</p></div><button className="button primary" onClick={() => setModal(true)}>＋ Register patient</button></div><div className="table-scroll"><table><thead><tr><th>PATIENT</th><th>PATIENT ID</th><th>RECORD STATUS</th></tr></thead><tbody>{filtered.map(p => <tr key={p.id}><td><div className="patient"><span className="patient-avatar">{p.name.split(" ").map(x=>x[0]).slice(0,2).join("")}</span><span><b>{p.name}</b><small>Demo record</small></span></div></td><td>{p.id}</td><td><span className="status green"><i />Demo only</span></td></tr>)}</tbody></table>{filtered.length === 0 && <div className="empty">No matching demo patients. Try another search.</div>}</div><div className="warning">Demo-only records are held in browser memory and are not saved to the database.</div></section>}
+        {active === "Patients" && <section className="panel patient-directory"><div className="panel-head"><div><h2>Patient directory</h2><p>{patients.length} demo records in this browser session</p></div><button className="button primary" onClick={() => setModal(true)}>＋ Register patient</button></div><div className="table-scroll"><table><thead><tr><th>PATIENT</th><th>PATIENT ID</th><th>RECORD STATUS</th></tr></thead><tbody>{filtered.map(p => <tr key={p.id}><td><div className="patient"><span className="patient-avatar">{p.name.split(" ").map(x=>x[0]).slice(0,2).join("")}</span><span><b>{p.name}</b><small>{p.phone || "Phone not provided"}</small></span></div></td><td>{p.id}</td><td><span className="status green"><i />Demo only</span></td></tr>)}</tbody></table>{filtered.length === 0 && <div className="empty">No matching demo patients. Try another search.</div>}</div><div className="warning">Demo-only records are held in browser memory and are not saved to the database.</div></section>}
 
         {active !== "Overview" && active !== "Patients" && <section className="module-card"><span className="module-symbol">{groups.flatMap(g=>g.items).find(x=>x.name===active)?.icon}</span><div className="eyebrow">CAREGRID WORKSPACE</div><h2>{active} module</h2><p>{summaries[active]} This workspace is mapped in the interface; its secure data workflows will be implemented and connected to PostgreSQL in stages.</p><div className="module-list"><div><span>01</span><b>Data model and validation</b><small>Tenant-scoped records and safe input rules</small></div><div><span>02</span><b>Role-based access</b><small>Permissions enforced on the server</small></div><div><span>03</span><b>Audited workflow</b><small>Traceable actions and reliable error handling</small></div></div><button className="button secondary" onClick={() => setActive("Overview")}>← Back to overview</button></section>}
       </div>
