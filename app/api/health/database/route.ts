@@ -32,6 +32,16 @@ export async function GET() {
     const db = getDb();
     await db`select 1 as ok`;
 
+    // Fail health checks if production connects with a superuser or RLS-bypassing role.
+    const [runtime] = await db`
+      SELECT
+        (NOT r.rolsuper AND NOT r.rolbypassrls AND r.rolcanlogin
+          AND current_setting('row_security') = 'on') AS secure_runtime
+      FROM pg_roles r
+      WHERE r.rolname = current_user
+    `;
+    const runtimeSecure = runtime?.secure_runtime === true;
+
     // Report only a generic readiness state; never expose schema names or DB errors.
     const [schema] = await db`
       SELECT count(*)::int AS ready_tables
@@ -49,13 +59,15 @@ export async function GET() {
     `;
 
     const schemaReady = Number(schema.ready_tables) === requiredTables.length;
+    const ready = schemaReady && runtimeSecure;
     return NextResponse.json(
       {
-        status: "ok",
+        status: ready ? "ok" : "unavailable",
         dependency: "database",
         schema: schemaReady ? "tables_ready" : "pending",
+        security: runtimeSecure ? "restricted_runtime_role" : "misconfigured_runtime_role",
       },
-      { status: 200, headers: { "Cache-Control": "no-store" } },
+      { status: ready ? 200 : 503, headers: { "Cache-Control": "no-store" } },
     );
   } catch {
     // Never return connection strings, provider errors or database details.
