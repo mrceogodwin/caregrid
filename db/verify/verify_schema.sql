@@ -14,6 +14,22 @@ DECLARE
     'appointments', 'encounters', 'encounter_amendments', 'observations'
   ];
   missing_count integer;
+  required_constraints text[][] := ARRAY[
+    ARRAY['departments', 'departments_facility_tenant_fk'],
+    ARRAY['departments', 'departments_org_facility_id_unique'],
+    ARRAY['patients', 'patients_facility_tenant_fk'],
+    ARRAY['patients', 'patients_org_facility_id_unique'],
+    ARRAY['patient_identifiers', 'patient_identifiers_patient_facility_fk'],
+    ARRAY['appointments', 'appointments_patient_facility_fk'],
+    ARRAY['appointments', 'appointments_department_tenant_fk'],
+    ARRAY['appointments', 'appointments_org_facility_patient_unique'],
+    ARRAY['encounters', 'encounters_patient_facility_fk'],
+    ARRAY['encounters', 'encounters_appointment_tenant_fk'],
+    ARRAY['encounters', 'encounters_org_facility_patient_unique'],
+    ARRAY['observations', 'observations_patient_facility_fk'],
+    ARRAY['observations', 'observations_encounter_fk']
+  ];
+  required_constraint text[];
 BEGIN
   FOREACH required_table IN ARRAY required_tables LOOP
     IF to_regclass(format('public.%I', required_table)) IS NULL THEN
@@ -47,6 +63,21 @@ BEGIN
   IF missing_count <> 0 THEN
     RAISE EXCEPTION 'Caregrid schema verification failed: % tables are missing tenant policies', missing_count;
   END IF;
+
+  FOREACH required_constraint IN ARRAY required_constraints LOOP
+    IF NOT EXISTS (
+      SELECT 1
+      FROM pg_constraint con
+      JOIN pg_class rel ON rel.oid = con.conrelid
+      JOIN pg_namespace ns ON ns.oid = rel.relnamespace
+      WHERE ns.nspname = 'public'
+        AND rel.relname = required_constraint[1]
+        AND con.conname = required_constraint[2]
+    ) THEN
+      RAISE EXCEPTION 'Caregrid schema verification failed: missing constraint %.%',
+        required_constraint[1], required_constraint[2];
+    END IF;
+  END LOOP;
 
   IF to_regprocedure('app_private.current_tenant_id()') IS NULL THEN
     RAISE EXCEPTION 'Caregrid schema verification failed: tenant context function is missing';
