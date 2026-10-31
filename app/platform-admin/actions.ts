@@ -81,3 +81,30 @@ export async function createOrganizationAction(
     };
   }
 }
+
+
+export async function activatePlatformAdminAction(): Promise<{ activated?: boolean; error?: string }> {
+  const session = await auth.getSession() as {
+    data?: { user?: SessionUser | null } | null;
+    user?: SessionUser | null;
+  };
+  const user = session.data?.user ?? session.user ?? null;
+
+  if (!user?.id || !user.email || user.emailVerified !== true) {
+    return { error: "Complete Google or email verification before activating platform access." };
+  }
+
+  const db = getDb();
+  try {
+    const rows = await db<{ activated: boolean }[]>`
+      SELECT app_private.platform_activate_super_admin(
+        ${user.id},
+        ${user.email.trim().toLowerCase()}
+      ) AS activated
+    `;
+    revalidatePath("/platform-admin");
+    return { activated: rows[0]?.activated === true };
+  } catch {
+    return { error: "This account is not eligible for platform activation. Contact the platform owner." };
+  }
+}
