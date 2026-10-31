@@ -1,7 +1,8 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth/server";
 import { getDb } from "@/lib/db";
-import { getPlatformAdminRole } from "@/lib/platform/access";
+import { getPlatformAdminRole, getPlatformAdminStatus } from "@/lib/platform/access";
+import { ActivatePlatformAdminForm } from "./activate-platform-admin-form";
 import { CreateOrganizationForm } from "./create-organization-form";
 
 export const dynamic = "force-dynamic";
@@ -33,6 +34,19 @@ export default async function PlatformAdminPage() {
 
   const role = await getPlatformAdminRole(user);
   if (role !== "platform_super_admin" || !user.email) {
+    const status = await getPlatformAdminStatus(user);
+    if (status === "pending_activation") {
+      return (
+        <main className="access-state">
+          <div className="access-mark">✚</div>
+          <p className="auth-eyebrow">CAREGRID · PLATFORM CONTROL</p>
+          <h1>Your identity is verified.</h1>
+          <p>This verified account matches the pending Platform Super Admin invitation.</p>
+          <p>Activate platform access to manage organizations and facilities. This action is recorded in the platform audit log.</p>
+          <ActivatePlatformAdminForm />
+        </main>
+      );
+    }
     return (
       <main className="access-state">
         <div className="access-mark">✚</div>
