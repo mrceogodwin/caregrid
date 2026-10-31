@@ -22,9 +22,10 @@ CREATE TABLE IF NOT EXISTS appointments (
     FOREIGN KEY (organization_id, facility_id, patient_id)
     REFERENCES patients (organization_id, facility_id, id) ON DELETE RESTRICT,
   CONSTRAINT appointments_department_tenant_fk
-    FOREIGN KEY (organization_id, department_id)
-    REFERENCES departments (organization_id, id) ON DELETE RESTRICT,
-  CONSTRAINT appointments_org_facility_id_unique UNIQUE (organization_id, facility_id, id)
+    FOREIGN KEY (organization_id, facility_id, department_id)
+    REFERENCES departments (organization_id, facility_id, id) ON DELETE RESTRICT,
+  CONSTRAINT appointments_org_facility_id_unique UNIQUE (organization_id, facility_id, id),
+  CONSTRAINT appointments_org_facility_patient_unique UNIQUE (organization_id, facility_id, id, patient_id)
 );
 
 CREATE INDEX IF NOT EXISTS appointments_facility_schedule_idx
@@ -52,13 +53,14 @@ CREATE TABLE IF NOT EXISTS encounters (
     FOREIGN KEY (organization_id, facility_id, patient_id)
     REFERENCES patients (organization_id, facility_id, id) ON DELETE RESTRICT,
   CONSTRAINT encounters_appointment_tenant_fk
-    FOREIGN KEY (organization_id, facility_id, appointment_id)
-    REFERENCES appointments (organization_id, facility_id, id) ON DELETE RESTRICT,
+    FOREIGN KEY (organization_id, facility_id, appointment_id, patient_id)
+    REFERENCES appointments (organization_id, facility_id, id, patient_id) ON DELETE RESTRICT,
   CONSTRAINT encounters_signature_consistency CHECK (
     (status IN ('draft', 'voided') AND signed_by IS NULL AND signed_at IS NULL)
     OR (status IN ('signed', 'amended') AND signed_by IS NOT NULL AND signed_at IS NOT NULL)
   ),
-  CONSTRAINT encounters_org_facility_id_unique UNIQUE (organization_id, facility_id, id)
+  CONSTRAINT encounters_org_facility_id_unique UNIQUE (organization_id, facility_id, id),
+  CONSTRAINT encounters_org_facility_patient_unique UNIQUE (organization_id, facility_id, id, patient_id)
 );
 
 CREATE INDEX IF NOT EXISTS encounters_patient_history_idx
@@ -98,8 +100,8 @@ CREATE TABLE IF NOT EXISTS observations (
     FOREIGN KEY (organization_id, facility_id, patient_id)
     REFERENCES patients (organization_id, facility_id, id) ON DELETE RESTRICT,
   CONSTRAINT observations_encounter_fk
-    FOREIGN KEY (organization_id, facility_id, encounter_id)
-    REFERENCES encounters (organization_id, facility_id, id) ON DELETE RESTRICT,
+    FOREIGN KEY (organization_id, facility_id, encounter_id, patient_id)
+    REFERENCES encounters (organization_id, facility_id, id, patient_id) ON DELETE RESTRICT,
   CONSTRAINT observations_org_id_unique UNIQUE (organization_id, id)
 );
 
