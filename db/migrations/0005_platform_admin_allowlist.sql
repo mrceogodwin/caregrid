@@ -15,7 +15,7 @@ REVOKE ALL ON TABLE app_private.platform_admin_allowlist FROM PUBLIC;
 GRANT SELECT ON TABLE app_private.platform_admin_allowlist TO caregrid_app;
 
 INSERT INTO app_private.platform_admin_allowlist (email, role, enabled)
-VALUES ('squadempireng@gmail.com', 'platform_super_admin', true)
+VALUES ('squadempireng@gmail.com', 'platform_super_admin', false)
 ON CONFLICT (email) DO UPDATE
 SET role = EXCLUDED.role,
     enabled = false;
