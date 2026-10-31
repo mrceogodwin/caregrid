@@ -15,7 +15,7 @@ const appointments = [
   { initials: "TI", name: "Tunde Ibrahim", id: "CG-000181", department: "General medicine", time: "10:00 AM", status: "Scheduled", tone: "slate" },
 ];
 const summaries: Record<Section, string> = {
-  Overview: "Here’s what’s happening at your facility today.",
+  Overview: "A clearer view of today’s operations, care delivery and team activity.",
   Patients: "Find patient records and manage registrations.",
   Appointments: "Coordinate today’s schedule and patient queue.",
   Clinical: "Encounters, observations and care notes.",
@@ -51,7 +51,7 @@ export default function Home() {
   return <div className="shell">
     <aside className="sidebar">
       <button className="brand" onClick={() => setActive("Overview")} aria-label="Caregrid home"><span className="brand-mark">✚</span><span className="brand-name">caregrid<span>.</span><small>HOSPITAL OS</small></span></button>
-      <div className="facility"><span className="facility-logo">CG</span><span><b>Caregrid Demo</b><small>Primary facility</small></span><span className="chevron">⌄</span></div>
+      <div className="facility"><span className="facility-logo">CG</span><span><b>Caregrid Preview</b><small>Primary facility</small></span><span className="chevron">⌄</span></div>
       {groups.map(group => <nav className="nav-group" key={group.title} aria-label={group.title}><p>{group.title}</p>{group.items.map(item => <button key={item.name} className={active === item.name ? "nav-item active" : "nav-item"} onClick={() => { setActive(item.name); setNotice(""); }}><Icon>{item.icon}</Icon><span>{item.name}</span>{item.name === "Appointments" && <small className="count">8</small>}</button>)}</nav>)}
       <div className="sidebar-spacer" />
       <div className="help-box"><span>?</span><div><b>Need a hand?</b><small>Visit the help centre</small></div></div>
@@ -62,7 +62,7 @@ export default function Home() {
       <header className="topbar"><div className="crumb">Caregrid <span>/</span> <b>{active}</b></div><div className="top-actions"><label className="search"><span>⌕</span><input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search patients, records..." aria-label="Search patients and records" /></label><button className="notification" aria-label="Notifications" onClick={() => setNotice("You’re all caught up. Notifications will appear here.")}>♧<i /></button><span className="avatar top-avatar">AD</span></div></header>
       <div className="content">
         {notice && <div className="notice" role="status">{notice}<button onClick={() => setNotice("")} aria-label="Dismiss">×</button></div>}
-        <div className="page-heading"><div><div className="eyebrow"><i /> THURSDAY, 29 OCTOBER 2026</div><h1>{active === "Overview" ? "Good morning, Admin" : active}</h1><p>{summaries[active]}</p></div><div className="heading-buttons"><button className="button secondary" onClick={() => setNotice("Exports will be enabled when reports are connected to saved data.")}>↧ Export report</button><button className="button primary" onClick={() => setModal(true)}>＋ Register patient</button></div></div>
+        <div className="page-heading"><div><div className="eyebrow"><i /> SATURDAY, 31 OCTOBER 2026</div><h1>{active === "Overview" ? "Your facility, at a glance" : active}</h1><p>{summaries[active]}</p></div><div className="heading-buttons"><button className="button secondary" onClick={() => setNotice("Exports will be enabled when reports are connected to saved data.")}>↧ Export report</button><button className="button primary" onClick={() => setModal(true)}>＋ Register patient</button></div></div>
 
         {active === "Overview" && <>
           <div className="demo-banner"><span className="banner-icon">✳</span><div><b>Your facility at a glance</b><p>This workspace uses sample data while secure patient workflows are being built.</p></div><span className="demo-tag">DEMO DATA</span></div>
