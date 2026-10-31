@@ -5,7 +5,7 @@ Caregrid is a multi-tenant hospital operations platform being built for private 
 ## Current status
 The initial Next.js App Router scaffold includes a responsive dashboard, workspace navigation, overview metrics, a patient directory and a demo-only registration interaction. All metrics and sample patient rows are illustrative. They are not medical records and must not be used for real patient care.
 
-A first PostgreSQL migration defines organizations, facilities, departments, memberships, patient records, patient identifiers and append-only audit events. PostgreSQL row-level security policies enforce organization scoping when a trusted server transaction sets its tenant context. A server-only PostgreSQL client and a non-cacheable database health endpoint are also in place. The migration has been committed but has **not** been applied to a live database because the Neon project and connection string are not yet verified.
+A first PostgreSQL migration defines organizations, facilities, departments, memberships, patient records, patient identifiers and append-only audit events. A second migration adds tenant-scoped appointments, clinical encounters, observations and append-only clinical amendments. PostgreSQL row-level security policies enforce organization scoping when a trusted server transaction sets its tenant context. Signed encounters cannot be edited or deleted in place. A server-only PostgreSQL client and a non-cacheable database health endpoint are also in place. The migration has been committed but has **not** been applied to a live database because the Neon project and connection string are not yet verified.
 
 ## Technology
 - Next.js App Router, React and TypeScript
@@ -19,8 +19,8 @@ A first PostgreSQL migration defines organizations, facilities, departments, mem
 ## Database setup
 1. Provision a Neon PostgreSQL project and select the intended production region.
 2. Configure the Neon connection string as a secret `DATABASE_URL` in Vercel for the appropriate environments. Do not commit it or paste it into source control.
-3. Review `db/migrations/0001_secure_tenant_foundation.sql` against the target database, then apply it using a trusted migration runner or `psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f db/migrations/0001_secure_tenant_foundation.sql`.
-4. Verify the tables, indexes, row-level security policies and audit immutability trigger before wiring application queries.
+3. Review and apply migrations in order: `0001_secure_tenant_foundation.sql`, then `0002_clinical_workflows.sql`. Use a trusted migration runner or `psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f db/migrations/0001_secure_tenant_foundation.sql` followed by the equivalent command for `0002_clinical_workflows.sql`.
+4. Verify tables, composite foreign keys, indexes, row-level security policies, append-only triggers and signed-encounter immutability before wiring application queries.
 5. Check `/api/health/database`. It returns only a generic status and never exposes connection details.
 
 Tenant context must be set transaction-locally by trusted server code after validating the authenticated user's active membership. Never trust a tenant ID supplied by a browser request. Do not use a superuser or a role with `BYPASSRLS` for normal application queries.
