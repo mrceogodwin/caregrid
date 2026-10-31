@@ -46,13 +46,13 @@ export default async function PlatformAdminPage() {
   }
 
   const db = getDb();
-  const organizations = await db<PlatformOrganization[]>\`
+  const organizations = await db<PlatformOrganization[]>`
     SELECT *
     FROM app_private.platform_list_organizations(
       ${user.id},
       ${user.email.trim().toLowerCase()}
     )
-  \`;
+  `;
 
   const facilityCount = organizations.reduce(
     (total, organization) => total + Number(organization.facility_count || 0),
