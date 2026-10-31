@@ -83,7 +83,7 @@ export async function createOrganizationAction(
 }
 
 
-export async function activatePlatformAdminAction(): Promise<{ activated?: boolean; error?: string }> {
+export async function activatePlatformAdminAction(_previous: { activated?: boolean; error?: string }): Promise<{ activated?: boolean; error?: string }> {
   const session = await auth.getSession() as {
     data?: { user?: SessionUser | null } | null;
     user?: SessionUser | null;
