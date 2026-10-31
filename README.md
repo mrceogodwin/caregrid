@@ -19,7 +19,7 @@ A first PostgreSQL migration defines organizations, facilities, departments, mem
 ## Database setup
 1. Provision a Neon PostgreSQL project and select the intended production region.
 2. Configure the Neon connection string as a secret `DATABASE_URL` in Vercel for the appropriate environments. Do not commit it or paste it into source control.
-3. Review and apply migrations in order: `0001_secure_tenant_foundation.sql`, then `0002_clinical_workflows.sql` and `0003_membership_access_foundation.sql`. Use a trusted migration runner or `psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f db/migrations/0001_secure_tenant_foundation.sql` followed by the equivalent command for `0002_clinical_workflows.sql`.
+3. Review and apply migrations in order: `0001_secure_tenant_foundation.sql`, then `0002_clinical_workflows.sql` and `0003_membership_access_foundation.sql`. Use a trusted migration runner or run these commands in order: `psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f db/migrations/0001_secure_tenant_foundation.sql`, then the equivalent command for `0002_clinical_workflows.sql`, then `psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f db/migrations/0003_membership_access_foundation.sql`.
 4. Run the read-only schema verification script with `psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f db/verify/verify_schema.sql`. It checks all 13 expected tables, forced row-level security, tenant policies and immutable-record triggers. The migrations have not yet been executed against Neon; do not treat a successful Vercel build as proof that the SQL has run.
 5. Check `/api/health/database`. It returns only a generic status and never exposes connection details.
 
