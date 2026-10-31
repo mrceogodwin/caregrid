@@ -7,7 +7,7 @@ The initial Next.js App Router scaffold includes a responsive dashboard, workspa
 
 ## Technology
 - Next.js App Router, React and TypeScript
-- Neon PostgreSQL (provisioned; application queries and migrations are not wired yet)
+- Neon PostgreSQL: planned; project provisioning and application connection are not yet verified
 - Vercel hosting
 - Planned private object storage: Cloudflare R2
 - Planned transactional notifications: Brevo
