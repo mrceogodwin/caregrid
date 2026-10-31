@@ -67,7 +67,7 @@ BEGIN
     RAISE EXCEPTION 'Caregrid schema verification failed: % tables are missing tenant policies', missing_count;
   END IF;
 
-  FOREACH required_constraint IN ARRAY required_constraints LOOP
+  FOREACH required_constraint SLICE 1 IN ARRAY required_constraints LOOP
     IF NOT EXISTS (
       SELECT 1
       FROM pg_constraint con
