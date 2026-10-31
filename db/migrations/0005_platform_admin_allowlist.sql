@@ -18,6 +18,6 @@ INSERT INTO app_private.platform_admin_allowlist (email, role, enabled)
 VALUES ('squadempireng@gmail.com', 'platform_super_admin', true)
 ON CONFLICT (email) DO UPDATE
 SET role = EXCLUDED.role,
-    enabled = EXCLUDED.enabled;
+    enabled = false;
 
 COMMIT;
