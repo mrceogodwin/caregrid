@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@neondatabase/auth": "0.7.0-beta",
     "next": "15.5.7",
     "postgres": "3.4.7",
     "react": "19.1.1",
