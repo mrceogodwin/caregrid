@@ -65,7 +65,7 @@ export function SignInForm() {
       </button>
       <div className="auth-divider"><span>OR</span></div>
       <button className="auth-submit auth-google" type="button" disabled={submitting} onClick={signInWithGoogle}>Continue with Google <span>↗</span></button>
-      <p className="auth-help">Use your verified Google work account or an account provisioned by your facility administrator. Public registration is not offered in this workspace.</p>
+      <p className="auth-help">Use your verified Google work account or an account provisioned by your facility administrator. Email verification is required, and public registration is disabled.</p>
     </form>
   );
 }
