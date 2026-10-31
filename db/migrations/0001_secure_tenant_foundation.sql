@@ -53,6 +53,7 @@ CREATE TABLE IF NOT EXISTS departments (
     REFERENCES facilities (organization_id, id) ON DELETE RESTRICT,
   CONSTRAINT departments_facility_code_unique UNIQUE (facility_id, code),
   CONSTRAINT departments_org_id_id_unique UNIQUE (organization_id, id)
+  ,CONSTRAINT departments_org_facility_id_unique UNIQUE (organization_id, facility_id, id)
 );
 
 -- user_id is the stable subject from the future authentication provider.
