@@ -5,12 +5,22 @@ Caregrid is a multi-tenant hospital operations platform being built for private 
 ## Current status
 The initial Next.js App Router scaffold includes a responsive dashboard, workspace navigation, overview metrics, a patient directory and a demo-only registration interaction. All metrics and sample patient rows are illustrative. They are not medical records and must not be used for real patient care.
 
+A first PostgreSQL migration now defines organizations, facilities, departments, memberships, patient records, patient identifiers and append-only audit events. PostgreSQL row-level security policies enforce organization scoping when a trusted server transaction sets its tenant context. The migration has been committed but has **not** been applied to a live database because the Neon project and connection string are not yet verified.
+
 ## Technology
 - Next.js App Router, React and TypeScript
-- Neon PostgreSQL: planned; project provisioning and application connection are not yet verified
+- PostgreSQL schema and migrations in `db/migrations`; Neon connection pending
 - Vercel hosting
 - Planned private object storage: Cloudflare R2
 - Planned transactional notifications: Brevo
+
+## Database setup
+1. Provision a Neon PostgreSQL project and select the intended production region.
+2. Configure the Neon connection string as a secret `DATABASE_URL` in Vercel for the appropriate environments. Do not commit it or paste it into source control.
+3. Review `db/migrations/0001_secure_tenant_foundation.sql` against the target database, then apply it using a trusted migration runner or `psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f db/migrations/0001_secure_tenant_foundation.sql`.
+4. Verify the tables, indexes, row-level security policies and audit immutability trigger before wiring application queries.
+
+Tenant context must be set transaction-locally by trusted server code after validating the authenticated user's active membership. Never trust a tenant ID supplied by a browser request. Do not use a superuser or a role with `BYPASSRLS` for normal application queries.
 
 ## Local development
 ```bash
