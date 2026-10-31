@@ -11,7 +11,8 @@ DECLARE
   required_tables text[] := ARRAY[
     'organizations', 'facilities', 'departments', 'memberships',
     'patients', 'patient_identifiers', 'audit_events',
-    'appointments', 'encounters', 'encounter_amendments', 'observations'
+    'appointments', 'encounters', 'encounter_amendments', 'observations',
+    'facility_memberships', 'membership_invitations'
   ];
   missing_count integer;
   required_constraints text[][] := ARRAY[
@@ -27,7 +28,9 @@ DECLARE
     ARRAY['encounters', 'encounters_appointment_tenant_fk'],
     ARRAY['encounters', 'encounters_org_facility_patient_unique'],
     ARRAY['observations', 'observations_patient_facility_fk'],
-    ARRAY['observations', 'observations_encounter_fk']
+    ARRAY['observations', 'observations_encounter_fk'],
+    ARRAY['facility_memberships', 'facility_memberships_facility_tenant_fk'],
+    ARRAY['facility_memberships', 'facility_memberships_membership_tenant_fk']
   ];
   required_constraint text[];
 BEGIN
@@ -119,7 +122,7 @@ BEGIN
     RAISE EXCEPTION 'Caregrid schema verification failed: amendment immutability trigger is missing';
   END IF;
 
-  RAISE NOTICE 'Caregrid schema verification passed: 11 tables, forced RLS, tenant policies and immutable-record triggers are present.';
+  RAISE NOTICE 'Caregrid schema verification passed: 13 tables, forced RLS, tenant policies and immutable-record triggers are present.';
 END
 $verify$;
 
@@ -138,7 +141,8 @@ WHERE n.nspname = 'public'
   AND c.relname IN (
     'organizations', 'facilities', 'departments', 'memberships',
     'patients', 'patient_identifiers', 'audit_events',
-    'appointments', 'encounters', 'encounter_amendments', 'observations'
+    'appointments', 'encounters', 'encounter_amendments', 'observations',
+    'facility_memberships', 'membership_invitations'
   )
 GROUP BY c.relname, c.relrowsecurity, c.relforcerowsecurity
 ORDER BY c.relname;
