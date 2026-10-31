@@ -101,9 +101,6 @@ CREATE INDEX IF NOT EXISTS patients_org_name_idx
 CREATE INDEX IF NOT EXISTS patients_org_phone_idx
   ON patients (organization_id, phone_e164)
   WHERE phone_e164 IS NOT NULL;
-CREATE INDEX IF NOT EXISTS patient_identifiers_org_patient_idx
-  ON patient_identifiers (organization_id, patient_id);
-
 CREATE TABLE IF NOT EXISTS patient_identifiers (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   organization_id uuid NOT NULL REFERENCES organizations(id) ON DELETE RESTRICT,
@@ -118,6 +115,9 @@ CREATE TABLE IF NOT EXISTS patient_identifiers (
   CONSTRAINT patient_identifiers_facility_value_unique
     UNIQUE (facility_id, identifier_type, identifier_value)
 );
+
+CREATE INDEX IF NOT EXISTS patient_identifiers_org_patient_idx
+  ON patient_identifiers (organization_id, patient_id);
 
 CREATE TABLE IF NOT EXISTS audit_events (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
