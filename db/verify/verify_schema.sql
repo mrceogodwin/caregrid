@@ -1,5 +1,5 @@
 -- Caregrid schema verification
--- Run after applying migrations 0001 and 0002 to the intended Neon database:
+-- Run after applying migrations 0001, 0002 and 0003 to the intended Neon database:
 -- psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f db/verify/verify_schema.sql
 --
 -- This script is read-only. It fails fast if a required table, RLS policy,
